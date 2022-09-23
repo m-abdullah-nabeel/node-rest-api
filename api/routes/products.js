@@ -1,44 +1,105 @@
 const express = require("express");
 const router = express.Router();
+const mongoose = require("mongoose");
+const ProductModel = require("../models/products");
 
-router.get('/', (req, res, next) => {
+// Fetch All the products
+router.get('/', async (req, res, next) => {
+    try {
+        const products = await ProductModel.find();
+        console.log(products)
+        res.status(200).json(products)
+    } catch (error) {
+        console.log(error)
+        res.status(200).json({
+            message: 'error', 
+            error: error
+        })
+    }
     res.status(200).json({
         message: "Handling GET on /products"
     })
 })
 
-router.post('/', (req, res, next) => {
-    res.status(200).json({
-        message: "Handling POST on /products"
+
+// Save data in Products
+router.post('/', async (req, res, next) => {
+    const product_ = new ProductModel({
+        name: req.body.name,
+        price: req.body.price
     })
+
+    product_.save()
+   .then(doc => {
+     console.log(doc)
+     res.status(200).json(doc)
+   })
+   .catch(err => {
+     console.error(err)
+     res.status(500).json(err)
+   })
 })
 
-router.get('/:product_id', (req, res, next) => {
+// Fetch one Product/Item
+router.get('/:product_id', async (req, res, next) => {
     const id = req.params.product_id
-    if (id === "special") {
+    try {
+        const product = await ProductModel.findById(id);
+        console.log(product);
+    
         res.status(200).json({
-            message: "You found special Id by GET on /products/:id"
+            message: "You requested Id by GET on /products/:id",
+            product: product
         })    
-    } else {
+    } catch (error) {
         res.status(200).json({
-            message: "You passed an argument by GET on /products/:id"
-        })    
+            message: "Your requested Id by GET on /products/:id Rsulted in an error",
+            error: error
+        })
     }
 })
 
-router.patch('/:product_id', (req, res, next) => {
+// Update the item
+router.patch('/:product_id', async (req, res, next) => {
     const id = req.params.product_id
-    res.status(200).json({
-        message: "Updated current by Id by PATCH on /products/:id"
-    })    
+    try {
+        const product = await ProductModel.update({_id: id}, {
+            name: req.body.name,
+            price: req.body.price
+        })
+        console.log(product);
+    
+        res.status(200).json({
+            message: "You requested Id by PATCH on /products/:id",
+            product: product
+        })    
+    } catch (error) {
+        res.status(404).json({
+            message: "Your requested Id by PATCH on /products/:id Rsulted in an error",
+            error: error.message
+        })
+    }
+
 })
 
-
-router.delete('/:product_id', (req, res, next) => {
+// Delete the item
+router.delete('/:product_id', async (req, res, next) => {
     const id = req.params.product_id
-    res.status(200).json({
-        message: "Deleted current by Id by DELETE on /products/:id"
-    })    
+    try {
+        const del_prod = await ProductModel.deleteOne({_id: id})
+        // console.log(del_prod)
+        res.status(200).json({
+            message: "Deleted current by Id by DELETE on /products/:id",
+            deleted: del_prod
+        })    
+    
+    } catch (error) {
+        console.log(error)
+        res.status(404).json({
+            message: "Deleted current by Id by DELETE on /products/:id",
+            error: error
+        })    
+    }
 })
 
 module.exports = router;

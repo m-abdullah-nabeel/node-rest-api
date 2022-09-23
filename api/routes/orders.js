@@ -8,8 +8,13 @@ router.get('/', (req, res, next) => {
 })
 
 router.post('/', (req, res, next) => {
+    const order = {
+        order_id: req.body.id,
+        product: req.body.product
+    }
     res.status(200).json({
-        message: "Handling POST on /orders"
+        message: "Handling POST on /orders",
+        order: order
     })
 })
 
