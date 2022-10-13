@@ -16,9 +16,9 @@ router.get('/', async (req, res, next) => {
             error: error
         })
     }
-    res.status(200).json({
-        message: "Handling GET on /products"
-    })
+    // res.status(200).json({
+    //     message: "Handling GET on /products"
+    // })
 })
 
 

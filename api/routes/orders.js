@@ -1,20 +1,41 @@
 const express = require("express");
 const router = express.Router();
+const mongoose = require("mongoose");
+const OrderModel = require("../models/order");
 
-router.get('/', (req, res, next) => {
-    res.status(200).json({
-        message: "Handling GET on /orders"
-    })
+router.get('/', async (req, res, next) => {
+    try {
+        const orders = await OrderModel.find();
+        console.log(orders)
+        res.status(200).json(orders)
+    } catch (error) {
+        console.log(error)
+        res.status(200).json({
+            message: 'error', 
+            error: error
+        })
+    }
 })
 
 router.post('/', (req, res, next) => {
-    const order = {
-        order_id: req.body.id,
-        product: req.body.product
-    }
-    res.status(200).json({
-        message: "Handling POST on /orders",
-        order: order
+    const order = new OrderModel({
+        // order_id: req.body.id,
+        product: req.body.product,
+        quantity: req.body.quantity
+    })
+    order.save()
+    .then((result) => {
+        console.log(result)
+        res.status(200).json({
+            result 
+        })
+    })
+    .catch((error) => {
+        console.log(error);
+        res.status(200).json({
+            message: "Handling POST on /orders, An Error Occurred",
+            error: error.message
+        })
     })
 })
 
