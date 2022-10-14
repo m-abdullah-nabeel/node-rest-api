@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 const ProductModel = require("../models/products");
+const multer = require("multer")
+const upload = multer({ dest: 'uploads/' })
 
 // Fetch All the products
 router.get('/', async (req, res, next) => {
@@ -23,7 +25,8 @@ router.get('/', async (req, res, next) => {
 
 
 // Save data in Products
-router.post('/', async (req, res, next) => {
+router.post('/', upload.single("productImage"), async (req, res, next) => {
+    console.log(req.file)
     const product_ = new ProductModel({
         name: req.body.name,
         price: req.body.price
