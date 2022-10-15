@@ -9,6 +9,10 @@ const productSchema = new Schema({
   price: {
     type: String,
     required: false
+  },
+  productImage: {
+    type: String,
+    required: false
   }
 });
 

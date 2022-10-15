@@ -3,7 +3,33 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const ProductModel = require("../models/products");
 const multer = require("multer")
-const upload = multer({ dest: 'uploads/' })
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, './uploads/')
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+        cb(null, uniqueSuffix + '-' + file.originalname)
+    }
+})
+
+const fileFilter = (req, file, cb) => {
+    if (file.mimetype == 'image/jpeg' || file.mimetype == 'image/png') {
+        cb(null, true)
+    } else {
+        cb(null, false)
+    }
+}
+
+const upload = multer({ storage: storage,
+    // accept upto 25 mb file size
+    limits: {
+    fileSize: 1024 * 1024 * 25
+    },
+    // accept ony images
+    fileFilter: fileFilter
+})
 
 // Fetch All the products
 router.get('/', async (req, res, next) => {
@@ -26,10 +52,11 @@ router.get('/', async (req, res, next) => {
 
 // Save data in Products
 router.post('/', upload.single("productImage"), async (req, res, next) => {
-    console.log(req.file)
+    // console.log(req.file)
     const product_ = new ProductModel({
         name: req.body.name,
-        price: req.body.price
+        price: req.body.price,
+        productImage: req.file.path
     })
 
     product_.save()
@@ -68,7 +95,8 @@ router.patch('/:product_id', async (req, res, next) => {
     try {
         const product = await ProductModel.update({_id: id}, {
             name: req.body.name,
-            price: req.body.price
+            price: req.body.price,
+            productImage: req.file.path
         })
         console.log(product);
     
