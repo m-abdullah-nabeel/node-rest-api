@@ -52,11 +52,12 @@ router.get('/', async (req, res, next) => {
 
 // Save data in Products
 router.post('/', upload.single("productImage"), async (req, res, next) => {
-    // console.log(req.file)
+    console.log(req.file)
     const product_ = new ProductModel({
         name: req.body.name,
         price: req.body.price,
-        productImage: req.file.path
+        productImage: req.file.path,
+        // productImage: req.file.filename
     })
 
     product_.save()
