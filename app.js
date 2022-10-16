@@ -14,6 +14,7 @@ app.use(morgan('dev'))
 // Getting Requests data
 app.use(body_parser.urlencoded({extended: true}))
 app.use(body_parser.json())
+app.use(express.static('uploads'));
 // CORS
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
